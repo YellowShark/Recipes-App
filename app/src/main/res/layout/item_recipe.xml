@@ -7,7 +7,7 @@
             name="viewModel"
             type="ru.example.recipesapp.ui.RecipesViewModel" />
         <variable
-            name="meal"
+            name="mealName"
             type="String" />
     </data>
 
@@ -26,7 +26,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:text="@{meal}"
+                android:text="@{mealName}"
                 tools:text="Simple name"
                 android:layout_margin="20dp"/>
         </LinearLayout>
