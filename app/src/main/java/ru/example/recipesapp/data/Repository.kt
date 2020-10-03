@@ -13,7 +13,10 @@ class Repository {
             retrofit2.Callback<List<Meal>> {
             override fun onResponse(call: Call<List<Meal>>, response: Response<List<Meal>>) {
                 liveData.value = response.body()
-                Log.d("TAG", "onResponse: ${response.body().toString()} ${response.message()}")
+                Log.d("TAG", "onResponse:\n" +
+                        "header: ${response.headers()}\n" +
+                        "body: ${response.body().toString()}\n" +
+                        "message: ${response.message()}")
             }
 
             override fun onFailure(call: Call<List<Meal>>, t: Throwable) {

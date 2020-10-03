@@ -9,9 +9,16 @@ import ru.example.recipesapp.data.model.Meal
 import ru.example.recipesapp.databinding.ItemRecipeBinding
 
 
-class RecipesAdapter(private val data: List<Meal>) : RecyclerView.Adapter<RecipesAdapter.RecipeHolder>() {
+class RecipesAdapter : RecyclerView.Adapter<RecipesAdapter.RecipeHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeHolder = RecipeHolder.create(parent)
+    private val data = ArrayList<Meal>()
+
+    init {
+        data.add((Meal(123, "Borsch")))
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeHolder =
+        RecipeHolder.create(parent)
 
     override fun onBindViewHolder(holder: RecipeHolder, position: Int) {
         holder.bind(data[position])
@@ -19,7 +26,10 @@ class RecipesAdapter(private val data: List<Meal>) : RecyclerView.Adapter<Recipe
 
     override fun getItemCount(): Int = data.size
 
-    class RecipeHolder(private val binding: ItemRecipeBinding) : RecyclerView.ViewHolder(binding.root) {
+    fun addItems(meals: List<Meal>) = data.addAll(meals)
+
+    class RecipeHolder(private val binding: ItemRecipeBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         fun bind(meal: Meal) {
             binding.mealName = meal.title
             binding.executePendingBindings()
@@ -28,7 +38,7 @@ class RecipesAdapter(private val data: List<Meal>) : RecyclerView.Adapter<Recipe
         companion object {
             fun create(parent: ViewGroup): RecipeHolder {
                 val inflater = LayoutInflater.from(parent.context)
-                val binding : ItemRecipeBinding =
+                val binding: ItemRecipeBinding =
                     DataBindingUtil.inflate(inflater, R.layout.item_recipe, parent, false)
                 return RecipeHolder(binding)
             }

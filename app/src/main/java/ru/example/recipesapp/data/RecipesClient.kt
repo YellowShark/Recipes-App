@@ -15,15 +15,16 @@ class RecipesClient {
         val API_KEY = "bded0e4356msha8326dd418def83p1b8ee9jsn2087776a706d"
 
         fun getApi(): RecipesApi {
-            val client = OkHttpClient.Builder().addInterceptor { chain ->
+            val client = OkHttpClient.Builder()
+                .addInterceptor { chain ->
                 val original = chain.request()
 
                 val request = original.newBuilder()
                     .header("x-rapidapi-key", API_KEY)
-                    .method(original.method(), original.body())
                     .build()
-                chain.proceed(request)
-            }.build()
+
+                chain.proceed(request) }
+                .build()
 
             val gson = GsonBuilder()
                 .setLenient()
