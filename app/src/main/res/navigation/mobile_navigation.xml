@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/mobile_navigation"
+    app:startDestination="@id/destination_home">
+
+    <fragment
+        android:id="@+id/destination_home"
+        android:name="ru.example.recipesapp.ui.HomeFragment"
+        android:label="Home">
+        <action
+            android:id="@+id/action_next"
+            app:destination="@id/destination_search" />
+    </fragment>
+    <fragment
+        android:id="@+id/destination_search"
+        android:name="ru.example.recipesapp.ui.search.FragmentSearch"
+        android:label="Search">
+        <action
+            android:id="@+id/action_destination_search_to_destination_home3"
+            app:destination="@id/destination_home" />
+    </fragment>
+</navigation>

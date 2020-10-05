@@ -1,44 +1,51 @@
 package ru.example.recipesapp.ui
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
-import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.LinearLayoutManager
+import android.view.Menu
+import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
+import androidx.navigation.ui.NavigationUI
 import kotlinx.android.synthetic.main.activity_main.*
 import ru.example.recipesapp.R
-import ru.example.recipesapp.utils.RecipesAdapter
 
 class MainActivity : AppCompatActivity() {
 
-    private val viewModel: RecipesViewModel by lazy {
-        ViewModelProviders.of(this).get(RecipesViewModel::class.java)
-    }
-    private lateinit var recipesAdapter: RecipesAdapter
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initUi()
-        initData()
     }
 
     private fun initUi() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-        toolbar.title = "Meals"
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recipesAdapter = RecipesAdapter()
-        recyclerView.adapter = recipesAdapter
+        navController = Navigation.findNavController(this, R.id.nav_host_fragment)
+        setupBottomNavMenu()
+        setupActionBar()
     }
 
-    private fun initData() {
-        viewModel.callApi()
-        viewModel.liveData.observe(this, { meals ->
-            if (meals != null) {
-                recipesAdapter.addItems(meals)
-            } else {
-                Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show()
-            }
-        })
+    private fun setupBottomNavMenu() {
+        bottom_nav?.let {
+            NavigationUI.setupWithNavController(it, navController)
+        }
     }
+
+    private fun setupActionBar() {
+        NavigationUI.setupActionBarWithNavController(this, navController)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.toolbar_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onSupportNavigateUp() =
+        navController.navigateUp()
 }
