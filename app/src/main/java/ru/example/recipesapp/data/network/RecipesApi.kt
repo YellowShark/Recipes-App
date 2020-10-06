@@ -8,7 +8,6 @@ import ru.example.recipesapp.data.network.model.SearchResponse
 interface RecipesApi {
     @GET("/recipes/complexSearch")
     fun getListOfRecipes(
-        /*@Query("apiKey") apiKey: String,*/
         @Query("query") mealName: String,
         @Query("number") num: Int
     ) : Call<SearchResponse>
