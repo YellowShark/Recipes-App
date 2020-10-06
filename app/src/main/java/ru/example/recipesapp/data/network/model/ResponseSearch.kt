@@ -2,7 +2,7 @@ package ru.example.recipesapp.data.network.model
 
 import com.google.gson.annotations.SerializedName
 
-data class SearchResponse(
+data class ResponseSearch(
     @SerializedName("offset") val offset: Long? = null,
     @SerializedName("number") val number: Long? = null,
     @SerializedName("results") val results: List<Meal>? = null,
