@@ -14,7 +14,7 @@ import ru.example.recipesapp.ui.RecipesAdapter
 class FragmentSearch : Fragment(R.layout.fragment_search) {
 
     private val viewModel: SearchViewModel by viewModel()
-    private var recipesAdapter: RecipesAdapter? = null
+    private lateinit var recipesAdapter: RecipesAdapter
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -38,8 +38,8 @@ class FragmentSearch : Fragment(R.layout.fragment_search) {
                 Log.d("TAG", "initData: ${event.data}")
                 when (event.status) {
                     Status.LOADING -> Toast.makeText(activity, "Loading...", Toast.LENGTH_SHORT).show()
-                    Status.SUCCESS -> event.data!!.results?.let { recipesAdapter!!.addItems(it) }
-                    Status.ERROR -> Toast.makeText(activity, "Error", Toast.LENGTH_SHORT).show()
+                    Status.SUCCESS -> event.data!!.results?.let { recipesAdapter.addItems(it) }
+                    Status.ERROR -> Toast.makeText(activity, "Error!!", Toast.LENGTH_SHORT).show()
                 }
             })
     }
