@@ -5,7 +5,7 @@
 
     <fragment
         android:id="@+id/destination_home"
-        android:name="ru.example.recipesapp.ui.HomeFragment"
+        android:name="ru.example.recipesapp.ui.home.HomeFragment"
         android:label="Home">
         <action
             android:id="@+id/action_next"
@@ -13,10 +13,26 @@
     </fragment>
     <fragment
         android:id="@+id/destination_search"
-        android:name="ru.example.recipesapp.ui.search.FragmentSearch"
+        android:name="ru.example.recipesapp.ui.search.main.FragmentSearch"
         android:label="Search">
         <action
             android:id="@+id/action_destination_search_to_destination_home3"
             app:destination="@id/destination_home" />
+        <action
+            android:id="@+id/action_destination_search_to_destination_details"
+            app:destination="@id/destination_details" />
+    </fragment>
+    <fragment
+        android:id="@+id/destination_settings"
+        android:name="ru.example.recipesapp.ui.settings.SettingsFragment"
+        android:label="Settings" />
+    <fragment
+        android:id="@+id/destination_details"
+        android:name="ru.example.recipesapp.ui.search.details.FragmentRecipeDetails"
+        android:label="Recipe details" >
+        <argument
+            android:name="recipeId"
+            app:argType="long"
+            android:defaultValue="0L" />
     </fragment>
 </navigation>

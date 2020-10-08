@@ -4,17 +4,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <include
+        layout="@layout/loading_layout"
+        android:visibility="gone" />
+
     <LinearLayout
+        android:id="@+id/search_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         tools:ignore="UselessParent">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/searchMeal"
+            android:id="@+id/etSearchMeal"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:hint="Input search request" />
+            android:hint="Search"
+            android:paddingStart="10dp"/>
 
         <ScrollView
             android:layout_width="match_parent"

@@ -1,4 +1,4 @@
-package ru.example.recipesapp.data
+package ru.example.recipesapp.data.network
 
 data class Event<out T>(val status: Status, val data: T?, val error: Error?) {
 

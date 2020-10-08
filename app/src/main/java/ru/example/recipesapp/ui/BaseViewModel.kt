@@ -6,9 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import ru.example.recipesapp.data.Event
+import ru.example.recipesapp.data.network.Event
 
 abstract class BaseViewModel : ViewModel() {
+
     fun <T> requestWithLiveData(
         liveData: MutableLiveData<Event<T>>,
         request: suspend () -> T

@@ -5,7 +5,8 @@ import org.koin.dsl.module.Module
 import org.koin.dsl.module.module
 import ru.example.recipesapp.data.DataRepository
 import ru.example.recipesapp.data.network.RecipesClient
-import ru.example.recipesapp.ui.search.SearchViewModel
+import ru.example.recipesapp.ui.search.details.RecipeDetailsViewModel
+import ru.example.recipesapp.ui.search.main.SearchViewModel
 
 val searchModule : Module = module {
     single { RecipesClient.getApi() }
@@ -13,4 +14,6 @@ val searchModule : Module = module {
     factory { DataRepository(get()) }
 
     viewModel { SearchViewModel(get()) }
+
+    viewModel { RecipeDetailsViewModel(get()) }
 }

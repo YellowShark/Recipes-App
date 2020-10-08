@@ -3,12 +3,15 @@ package ru.example.recipesapp.ui
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.MotionEvent
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.ui.NavigationUI
 import kotlinx.android.synthetic.main.activity_main.*
 import ru.example.recipesapp.R
+import ru.example.recipesapp.utils.hideKeyboard
 
 class MainActivity : AppCompatActivity() {
 
@@ -43,9 +46,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return super.onOptionsItemSelected(item)
+        val navigated = NavigationUI.onNavDestinationSelected(item, navController)
+        return navigated || super.onOptionsItemSelected(item)
     }
 
     override fun onSupportNavigateUp() =
         navController.navigateUp()
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        hideKeyboard(currentFocus?: View(this))
+        return super.dispatchTouchEvent(ev)
+    }
 }
