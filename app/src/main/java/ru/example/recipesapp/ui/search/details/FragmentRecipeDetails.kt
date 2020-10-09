@@ -1,6 +1,7 @@
 package ru.example.recipesapp.ui.search.details
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -54,19 +55,20 @@ class FragmentRecipeDetails : Fragment() {
             val safeArgs = FragmentRecipeDetailsArgs.fromBundle(it)
             viewModel.requestDetails(safeArgs.recipeId)
         }
-        viewModel.liveData.observe(this, {event ->
+        viewModel.liveData.observe(this, { event ->
+            Log.d("TAG", "initData: ${event.data}")
             when (event.status) {
                 Status.LOADING -> onLoading()
-                Status.SUCCESS -> onSuccess(event.data)
+                Status.SUCCESS -> onSuccess(event.data!!)
                 Status.ERROR -> onError()
             }
         })
     }
 
-    private fun onSuccess(data: ResponseDetails?) {
+    private fun onSuccess(data: ResponseDetails) {
         details_view.visibility = View.VISIBLE
         loading_view.visibility = View.GONE
-        instructionAdapter.setItems(data!!.analyzedInstructions[0].steps)
+        instructionAdapter.setItems(data.analyzedInstructions)
         viewModel.recipeName.value = data.title
         viewModel.recipeImage.value = data.image
     }

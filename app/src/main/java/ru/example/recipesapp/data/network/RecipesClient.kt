@@ -5,8 +5,7 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import ru.example.recipesapp.utils.API_KEY
-import ru.example.recipesapp.utils.BASE_URL
+import ru.example.recipesapp.BuildConfig
 
 
 class RecipesClient {
@@ -20,7 +19,7 @@ class RecipesClient {
                 val url = chain.request()
                     .url()
                     .newBuilder()
-                    .addQueryParameter("apiKey", API_KEY)
+                    .addQueryParameter("apiKey", BuildConfig.API_KEY)
                     .build()
                 val request = chain.request()
                     .newBuilder()
@@ -34,7 +33,7 @@ class RecipesClient {
                 .build()
 
             val retrofit = Retrofit.Builder()
-                .baseUrl(BASE_URL)
+                .baseUrl(BuildConfig.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .client(okHttpClient)
                 .build()

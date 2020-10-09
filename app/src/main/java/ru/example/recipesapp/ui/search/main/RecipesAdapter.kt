@@ -1,6 +1,8 @@
 package ru.example.recipesapp.ui.search.main
 
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -13,24 +15,52 @@ import ru.example.recipesapp.databinding.ItemRecipeBinding
 
 class RecipesAdapter(
     private val listener: (Meal) -> Unit
-) : RecyclerView.Adapter<RecipesAdapter.RecipeHolder>() {
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private val data = ArrayList<Meal>()
+    private val VIEW_ITEM_TYPE = 0
+    private val VIEW_LOADING_TYPE = 1
+    private val data = ArrayList<Meal?>()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeHolder =
-        RecipeHolder.create(parent)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return if (viewType == VIEW_ITEM_TYPE)
+            RecipeHolder.create(parent)
+        else {
+            Log.d("TAG", "onCreateViewHolder: hello")
+            val v =
+                LayoutInflater.from(parent.context).inflate(R.layout.item_loading, parent, false)
+            LoadingViewHolder(v)
+        }
+    }
 
-    override fun onBindViewHolder(holder: RecipeHolder, position: Int) {
-        val item = data[position]
-        holder.bind(item)
-        holder.itemView.btnViewRecipe.setOnClickListener { listener(item) }
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (holder is RecipeHolder) {
+            val item = data[position]
+            holder.bind(item!!)
+            holder.itemView.btnViewRecipe.setOnClickListener { listener(item) }
+        }
     }
 
     override fun getItemCount(): Int = data.size
 
+    override fun getItemViewType(position: Int): Int {
+        return if (data[position] == null) VIEW_LOADING_TYPE else VIEW_ITEM_TYPE
+    }
+
     fun setItems(meals: List<Meal>) {
         data.clear()
         data.addAll(meals)
+        notifyDataSetChanged()
+    }
+
+    fun addNull() {
+        if (itemCount != 0) {
+            data.add(null)
+            notifyDataSetChanged()
+        }
+    }
+
+    fun removeNull() {
+        data.remove(null)
         notifyDataSetChanged()
     }
 
@@ -59,4 +89,6 @@ class RecipesAdapter(
             }
         }
     }
+
+    class LoadingViewHolder(view: View) : RecyclerView.ViewHolder(view)
 }

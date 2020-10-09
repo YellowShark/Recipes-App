@@ -7,7 +7,7 @@ import ru.example.recipesapp.data.network.model.search.ResponseSearch
 
 class DataRepository(private val api: RecipesApi) {
 
-    suspend fun getListOfRequestedMeal(request: String) : ResponseSearch = api.getListOfRecipes(request, num = 10)
+    suspend fun getListOfRequestedMeal(request: String, num: Int) : ResponseSearch = api.getListOfRecipes(request, num)
 
     suspend fun getRecipeDetails(id: Long) : ResponseDetails = api.getRecipeDetails(id)
 }

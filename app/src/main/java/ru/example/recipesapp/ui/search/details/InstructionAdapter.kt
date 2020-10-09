@@ -7,8 +7,10 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_step.view.*
 import ru.example.recipesapp.R
+import ru.example.recipesapp.data.network.model.details.Instruction
 import ru.example.recipesapp.data.network.model.details.Step
 import ru.example.recipesapp.databinding.ItemStepBinding
+import java.util.*
 
 class InstructionAdapter : RecyclerView.Adapter<InstructionAdapter.StepHolder>() {
 
@@ -22,9 +24,13 @@ class InstructionAdapter : RecyclerView.Adapter<InstructionAdapter.StepHolder>()
 
     override fun getItemCount() = data.size
 
-    fun setItems(steps: List<Step>) {
+    fun setItems(instructions: List<Instruction>) {
         data.clear()
-        data.addAll(steps)
+        try {
+            data.addAll(instructions[0].steps)
+        } catch (e: IndexOutOfBoundsException) {
+            e.printStackTrace()
+        }
         notifyDataSetChanged()
     }
 

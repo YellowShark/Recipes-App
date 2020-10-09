@@ -15,8 +15,8 @@ class RecipeDetailsViewModel(private val repository: DataRepository) : BaseViewM
 
     /*@Bindable
     val loading = MutableLiveData<Boolean>()*/
-    val recipeName = MutableLiveData<String>()
-    val recipeImage = MutableLiveData<String>()
+    val recipeName = MutableLiveData<String>("")
+    val recipeImage = MutableLiveData<String>("")
 
     fun requestDetails(id: Long) {
         requestWithLiveData(liveData) {

@@ -50,8 +50,7 @@ class MainActivity : AppCompatActivity() {
         return navigated || super.onOptionsItemSelected(item)
     }
 
-    override fun onSupportNavigateUp() =
-        navController.navigateUp()
+    override fun onSupportNavigateUp() = navController.navigateUp()
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
         hideKeyboard(currentFocus?: View(this))

@@ -20,8 +20,10 @@ android {
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "BASE_URL", '"https://api.spoonacular.com/"'
+        buildConfigField "String", "API_KEY", '"d8984725e8224950a239ba8a2e1ecf47"'
     }
 
     buildTypes {

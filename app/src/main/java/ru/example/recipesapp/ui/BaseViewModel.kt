@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ru.example.recipesapp.data.network.Event
 
@@ -14,9 +15,7 @@ abstract class BaseViewModel : ViewModel() {
         liveData: MutableLiveData<Event<T>>,
         request: suspend () -> T
     ) {
-
         liveData.postValue(Event.loading())
-
         this.viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = request.invoke()
@@ -30,6 +29,7 @@ abstract class BaseViewModel : ViewModel() {
                 e.printStackTrace()
                 liveData.postValue(Event.error(null))
             }
+            delay(500)
         }
     }
 }
