@@ -35,6 +35,12 @@ class FragmentSearch : Fragment(R.layout.fragment_search) {
             }
             return@setOnEditorActionListener false
         }
+        etSearchMeal.setOnClickListener {
+            if (etSearchMeal.text?.isNotEmpty()!!) {
+                etSearchMeal.setText("")
+                recipesAdapter.removeAll()
+            }
+        }
 
         recipesAdapter = RecipesAdapter { item ->
             val actionDetails = FragmentSearchDirections.actionDestinationSearchToDestinationDetails()

@@ -64,6 +64,11 @@ class RecipesAdapter(
         notifyDataSetChanged()
     }
 
+    fun removeAll() {
+        data.clear()
+        notifyDataSetChanged()
+    }
+
     class RecipeHolder(private val binding: ItemRecipeBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(meal: Meal) {
