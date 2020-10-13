@@ -1,4 +1,4 @@
-package ru.example.recipesapp.ui
+package ru.example.recipesapp
 
 import android.app.Application
 import org.koin.android.ext.android.startKoin

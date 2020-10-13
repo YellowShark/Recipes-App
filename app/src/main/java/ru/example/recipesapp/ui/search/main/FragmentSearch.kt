@@ -1,21 +1,23 @@
 package ru.example.recipesapp.ui.search.main
 
 import android.os.Bundle
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_search.*
 import org.koin.android.viewmodel.ext.android.viewModel
 import ru.example.recipesapp.R
-import ru.example.recipesapp.data.network.Status
 import ru.example.recipesapp.data.network.model.search.ResponseSearch
+import ru.example.recipesapp.ui.BaseFragment
+import ru.example.recipesapp.utils.Status
 import ru.example.recipesapp.utils.hideKeyboard
 
 
-class FragmentSearch : Fragment(R.layout.fragment_search) {
+class FragmentSearch : BaseFragment(R.layout.fragment_search) {
 
     private val viewModel: SearchViewModel by viewModel()
     private lateinit var recipesAdapter: RecipesAdapter
@@ -29,17 +31,17 @@ class FragmentSearch : Fragment(R.layout.fragment_search) {
     private fun initUi() {
         etSearchMeal.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                startLoad()
+                fetchRecipes()
                 view?.let { activity?.hideKeyboard(it) }
                 return@setOnEditorActionListener true
             }
             return@setOnEditorActionListener false
         }
+
         etSearchMeal.setOnClickListener {
-            if (etSearchMeal.text?.isNotEmpty()!!) {
-                etSearchMeal.setText("")
-                recipesAdapter.removeAll()
-            }
+            etSearchMeal.setText("")
+            hideOptions()
+            recipesAdapter.removeAll()
         }
 
         recipesAdapter = RecipesAdapter { item ->
@@ -47,9 +49,16 @@ class FragmentSearch : Fragment(R.layout.fragment_search) {
             actionDetails.recipeId = item.id
             view?.let { Navigation.findNavController(it).navigate(actionDetails) }
         }
+
+        val recipesLayoutManager = LinearLayoutManager(activity)
+
+        val divider =
+            DividerItemDecoration(requireContext(), recipesLayoutManager.orientation)
+
         recyclerView.apply {
-            layoutManager = LinearLayoutManager(activity)
+            layoutManager = recipesLayoutManager
             adapter = recipesAdapter
+            addItemDecoration(divider)
         }
 
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -65,40 +74,56 @@ class FragmentSearch : Fragment(R.layout.fragment_search) {
     }
 
     private fun loadMore() {
-        if (viewModel.liveData.value!!.data != null)
+        if (viewModel.liveData.value?.data != null)
             if (viewModel.liveData.value?.data?.totalResults!! > recipesAdapter.itemCount) {
-                startLoad()
+                fetchRecipes()
             }
     }
 
-    private fun startLoad() {
-        val request = etSearchMeal.text.toString()
-        if (request.isNotEmpty())
-            viewModel.startSearchRecipe(request, recipesAdapter.itemCount + 10)
+    private fun fetchRecipes() {
+        val inputtedText = etSearchMeal.text.toString()
+        if (inputtedText.isNotEmpty()) {
+            viewModel.startSearchRecipe(request = inputtedText, num = recipesAdapter.itemCount + 10)
+            onLoading()
+        }
     }
 
     private fun initData() {
         viewModel.liveData.observe(
-            this, { event ->
+            viewLifecycleOwner, { event ->
                 when (event.status) {
-                    Status.LOADING -> onLoading()
-                    Status.SUCCESS -> onSuccess(event.data)
+                    Status.SUCCESS -> onSuccess( data = event.data!!)
+                    Status.EMPTY -> onEmptyData()
                     Status.ERROR -> onError()
                 }
             })
     }
 
-    private fun onSuccess(data: ResponseSearch?) {
-        recipesAdapter.removeNull()
-        data!!.results?.let { recipesAdapter.setItems(it) }
+    private fun onEmptyData() {
+        Toast.makeText(activity, "On your request nothing were found.", Toast.LENGTH_LONG).show()
     }
 
+    private fun onSuccess(data: ResponseSearch) {
+        recipesAdapter.removeLoader()
+        data.results?.let { recipesAdapter.setItems(meals = it) }
+        showOptions()
+    }
     private fun onLoading() {
-        //push null to adapter's data list -> adapter binds progressbar
-        recipesAdapter.addNull()
+        recipesAdapter.addLoader()
     }
 
     private fun onError() {
-        Toast.makeText(activity, "Error!!! Try again later.", Toast.LENGTH_SHORT).show()
+        Toast.makeText(activity, "Something went wrong. Try again later.", Toast.LENGTH_SHORT).show()
     }
+
+
+    private fun showOptions() {
+        search_options.visibility = View.VISIBLE
+    }
+
+    private fun hideOptions() {
+        search_options.visibility = View.GONE
+    }
+
+
 }

@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import ru.example.recipesapp.data.network.Event
+import ru.example.recipesapp.utils.Event
 
 abstract class BaseViewModel : ViewModel() {
 
@@ -17,19 +17,19 @@ abstract class BaseViewModel : ViewModel() {
     ) {
         liveData.postValue(Event.loading())
         this.viewModelScope.launch(Dispatchers.IO) {
+            delay(1000)
             try {
                 val response = request.invoke()
                 Log.d("TAG", "requestWithLiveData: $response")
                 if (response != null) {
                     liveData.postValue(Event.success(response))
                 } else {
-                    liveData.postValue(Event.error(null))
+                    liveData.postValue(Event.empty())
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                liveData.postValue(Event.error(null))
+                liveData.postValue(Event.error(Error(e.message)))
             }
-            delay(500)
         }
     }
 }

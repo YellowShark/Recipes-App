@@ -1,6 +1,6 @@
-package ru.example.recipesapp.data.network
+package ru.example.recipesapp.utils
 
-data class Event<out T>(val status: Status, val data: T?, val error: Error?) {
+data class Event<out T>(val status: Status = Status.EMPTY, val data: T?, val error: Error?) {
 
     companion object {
         fun <T> loading(): Event<T> {
@@ -11,6 +11,10 @@ data class Event<out T>(val status: Status, val data: T?, val error: Error?) {
             return Event(Status.SUCCESS, data, null)
         }
 
+        fun <T> empty(): Event<T> {
+            return Event(Status.EMPTY, null, null)
+        }
+
         fun <T> error(error: Error?): Event<T> {
             return Event(Status.ERROR, null, error)
         }
@@ -18,7 +22,8 @@ data class Event<out T>(val status: Status, val data: T?, val error: Error?) {
 }
 
 enum class Status {
+    LOADING,
     SUCCESS,
-    ERROR,
-    LOADING
+    EMPTY,
+    ERROR;
 }

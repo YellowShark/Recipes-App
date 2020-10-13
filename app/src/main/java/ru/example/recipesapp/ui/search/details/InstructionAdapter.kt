@@ -36,19 +36,22 @@ class InstructionAdapter : RecyclerView.Adapter<InstructionAdapter.StepHolder>()
 
     class StepHolder(private val binding: ItemStepBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(step: Step) {
-            binding.stepNum = "Step ${step.number}"
-            if (step.ingredients.isNotEmpty()) {
-                val sb = StringBuilder()
-                for (i in step.ingredients) {
-                    sb.append(i.name).append("\n")
-                }
-                binding.ingredients = sb.toString()
-            }
-            else
-                binding.root.titleIngredients.visibility = View.GONE
-            binding.instruction = step.step
+            with(binding) {
+                stepNum = "Step ${step.number}"
 
-            binding.executePendingBindings()
+                if (step.ingredients.isNotEmpty()) {
+                    val sb = StringBuilder()
+                    for (i in step.ingredients) {
+                        sb.append(i.name).append("\n")
+                    }
+                    ingredients = sb.toString()
+                }
+                else
+                    root.titleIngredients.visibility = View.GONE
+
+                instruction = step.step
+                executePendingBindings()
+            }
         }
         companion object {
             fun create(parent: ViewGroup): StepHolder {

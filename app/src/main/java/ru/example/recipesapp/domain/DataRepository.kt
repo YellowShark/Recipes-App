@@ -1,4 +1,4 @@
-package ru.example.recipesapp.data
+package ru.example.recipesapp.domain
 
 
 import ru.example.recipesapp.data.network.RecipesApi

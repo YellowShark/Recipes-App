@@ -11,19 +11,51 @@
         android:padding="8dp"
         tools:ignore="UselessParent">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etSearchMeal"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_margin="8dp"
-            android:hint="Input your request"
-            android:imeOptions="actionSearch"
-            android:inputType="text"
-            android:paddingStart="10dp" />
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etSearchMeal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:hint="@string/input_your_request_to_search"
+                android:imeOptions="actionSearch"
+                android:inputType="text" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <LinearLayout
+            android:id="@+id/search_options"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <Button
+                android:id="@+id/btnSortBy"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_margin="8dp"
+                android:text="@string/sort_by" />
+
+            <Button
+                android:id="@+id/btnFilter"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:layout_weight="1"
+                android:text="@string/filters" />
+        </LinearLayout>
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_margin="8dp">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"

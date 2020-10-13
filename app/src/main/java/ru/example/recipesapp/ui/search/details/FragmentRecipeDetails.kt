@@ -1,23 +1,22 @@
 package ru.example.recipesapp.ui.search.details
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_recipe_details.*
 import kotlinx.android.synthetic.main.loading_layout.*
 import org.koin.android.viewmodel.ext.android.viewModel
 import ru.example.recipesapp.R
-import ru.example.recipesapp.data.network.Status
 import ru.example.recipesapp.data.network.model.details.ResponseDetails
 import ru.example.recipesapp.databinding.FragmentRecipeDetailsBinding
+import ru.example.recipesapp.ui.BaseFragment
+import ru.example.recipesapp.utils.Status
 
-class FragmentRecipeDetails : Fragment() {
+class FragmentRecipeDetails : BaseFragment(R.layout.fragment_recipe_details) {
 
     private val viewModel: RecipeDetailsViewModel by viewModel()
     private lateinit var instructionAdapter: InstructionAdapter
@@ -34,8 +33,11 @@ class FragmentRecipeDetails : Fragment() {
             container,
             false
         )
-        binding.lifecycleOwner = this
-        binding.viewmodel = viewModel
+
+        binding.apply {
+            lifecycleOwner = this@FragmentRecipeDetails
+            viewmodel = viewModel
+        }
         return binding.root
     }
 
@@ -46,8 +48,10 @@ class FragmentRecipeDetails : Fragment() {
 
     private fun initUi() {
         instructionAdapter = InstructionAdapter()
-        recyclerView.layoutManager = LinearLayoutManager(activity)
-        recyclerView.adapter = instructionAdapter
+        recyclerView.apply {
+            layoutManager = LinearLayoutManager(activity)
+            adapter = instructionAdapter
+        }
     }
 
     private fun initData() {
@@ -55,8 +59,7 @@ class FragmentRecipeDetails : Fragment() {
             val safeArgs = FragmentRecipeDetailsArgs.fromBundle(it)
             viewModel.requestDetails(safeArgs.recipeId)
         }
-        viewModel.liveData.observe(this, { event ->
-            Log.d("TAG", "initData: ${event.data}")
+        viewModel.liveData.observe(viewLifecycleOwner, { event ->
             when (event.status) {
                 Status.LOADING -> onLoading()
                 Status.SUCCESS -> onSuccess(event.data!!)
@@ -69,8 +72,10 @@ class FragmentRecipeDetails : Fragment() {
         details_view.visibility = View.VISIBLE
         loading_view.visibility = View.GONE
         instructionAdapter.setItems(data.analyzedInstructions)
-        viewModel.recipeName.value = data.title
-        viewModel.recipeImage.value = data.image
+        viewModel.apply {
+            recipeName.value = data.title
+            recipeImage.value = data.image
+        }
     }
 
     private fun onError() {
@@ -84,7 +89,9 @@ class FragmentRecipeDetails : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        binding.viewmodel = null
-        binding.executePendingBindings()
+        binding.apply {
+            viewmodel = null
+            executePendingBindings()
+        }
     }
 }

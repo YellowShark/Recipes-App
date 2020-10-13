@@ -8,8 +8,10 @@
         android:name="ru.example.recipesapp.ui.home.HomeFragment"
         android:label="Home">
         <action
-            android:id="@+id/action_next"
-            app:destination="@id/destination_search" />
+            android:id="@+id/action_to_search"
+            app:destination="@id/destination_search"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/destination_search"
@@ -17,15 +19,15 @@
         android:label="Search">
         <action
             android:id="@+id/action_destination_search_to_destination_home3"
-            app:destination="@id/destination_home" />
+            app:destination="@id/destination_home"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
         <action
             android:id="@+id/action_destination_search_to_destination_details"
-            app:destination="@id/destination_details" />
+            app:destination="@id/destination_details"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
     </fragment>
-    <fragment
-        android:id="@+id/destination_settings"
-        android:name="ru.example.recipesapp.ui.settings.SettingsFragment"
-        android:label="Settings" />
     <fragment
         android:id="@+id/destination_details"
         android:name="ru.example.recipesapp.ui.search.details.FragmentRecipeDetails"
@@ -35,4 +37,8 @@
             app:argType="long"
             android:defaultValue="0L" />
     </fragment>
+    <fragment
+        android:id="@+id/destination_settings"
+        android:name="ru.example.recipesapp.ui.settings.SettingsFragment"
+        android:label="Settings" />
 </navigation>

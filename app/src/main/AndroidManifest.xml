@@ -10,10 +10,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:name=".ui.App">
+        android:name=".App">
         <activity
             android:name=".ui.MainActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
