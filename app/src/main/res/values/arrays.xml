@@ -1,9 +1,15 @@
 <resources>
     <string-array name="sort_array">
-        <item>Popularity</item>
-        <item>Healthiness</item>
-        <item>Price</item>
-        <item>Time</item>
+        <item>popularity</item>
+        <item>calories</item>
+        <item>healthiness</item>
+        <item>price</item>
+        <item>time</item>
+    </string-array>
+
+    <string-array name="sort_directions">
+        <item>asc</item>
+        <item>desc</item>
     </string-array>
 
     <!-- Reply Preference -->

@@ -8,10 +8,12 @@ import ru.example.recipesapp.utils.Event
 
 class SearchViewModel(private val repository: DataRepository) : BaseViewModel() {
     val liveData = MutableLiveData<Event<ResponseSearch>>(Event.loading())
+    var sortBy = "popularity"
+    var sortDir = "asc"
 
     fun startSearchRecipe(request: String, num: Int) {
          requestWithLiveData(liveData) {
-             repository.getListOfRequestedMeal(request, num)
+             repository.getListOfRequestedMeal(request, num, sortBy, sortDir)
          }
     }
 }

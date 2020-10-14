@@ -48,7 +48,7 @@ class FragmentRecipeDetails : BaseFragment(R.layout.fragment_recipe_details) {
 
     private fun initUi() {
         instructionAdapter = InstructionAdapter()
-        recyclerView.apply {
+        recipesList_rv.apply {
             layoutManager = LinearLayoutManager(activity)
             adapter = instructionAdapter
         }

@@ -3,6 +3,8 @@ package ru.example.recipesapp.ui.search.main
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -17,7 +19,7 @@ import ru.example.recipesapp.utils.Status
 import ru.example.recipesapp.utils.hideKeyboard
 
 
-class FragmentSearch : BaseFragment(R.layout.fragment_search) {
+class FragmentSearch : BaseFragment(R.layout.fragment_search), AdapterView.OnItemSelectedListener {
 
     private val viewModel: SearchViewModel by viewModel()
     private lateinit var recipesAdapter: RecipesAdapter
@@ -40,12 +42,37 @@ class FragmentSearch : BaseFragment(R.layout.fragment_search) {
 
         etSearchMeal.setOnClickListener {
             etSearchMeal.setText("")
-            hideOptions()
             recipesAdapter.removeAll()
         }
 
+        initRecyclerView()
+
+        context?.let { ctx ->
+            ArrayAdapter.createFromResource(
+                ctx,
+                R.array.sort_array,
+                android.R.layout.simple_spinner_item
+            ).also { adapter ->
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                sortList_spinner.adapter = adapter
+                sortList_spinner.onItemSelectedListener = this
+            }
+            ArrayAdapter.createFromResource(
+                ctx,
+                R.array.sort_directions,
+                android.R.layout.simple_spinner_item
+            ).also { adapter ->
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                sortDirList_spinner.adapter = adapter
+                sortDirList_spinner.onItemSelectedListener = this
+            }
+        }
+    }
+
+    private fun initRecyclerView() {
         recipesAdapter = RecipesAdapter { item ->
-            val actionDetails = FragmentSearchDirections.actionDestinationSearchToDestinationDetails()
+            val actionDetails =
+                FragmentSearchDirections.actionDestinationSearchToDestinationDetails()
             actionDetails.recipeId = item.id
             view?.let { Navigation.findNavController(it).navigate(actionDetails) }
         }
@@ -55,17 +82,19 @@ class FragmentSearch : BaseFragment(R.layout.fragment_search) {
         val divider =
             DividerItemDecoration(requireContext(), recipesLayoutManager.orientation)
 
-        recyclerView.apply {
+        recipesList_rv.apply {
             layoutManager = recipesLayoutManager
             adapter = recipesAdapter
             addItemDecoration(divider)
         }
 
-        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        recipesList_rv.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 val linearLayoutManager = recyclerView.layoutManager as LinearLayoutManager?
-                if (linearLayoutManager != null && linearLayoutManager.findLastCompletelyVisibleItemPosition() == recipesAdapter.itemCount - 1) {
+                if (linearLayoutManager != null
+                    && linearLayoutManager.findLastCompletelyVisibleItemPosition() == recipesAdapter.itemCount - 1
+                ) {
                     //bottom of list!
                     loadMore()
                 }
@@ -75,7 +104,8 @@ class FragmentSearch : BaseFragment(R.layout.fragment_search) {
 
     private fun loadMore() {
         if (viewModel.liveData.value?.data != null)
-            if (viewModel.liveData.value?.data?.totalResults!! > recipesAdapter.itemCount) {
+            if (recipesAdapter.itemCount > 1 //to except situation with loading and double request
+                && viewModel.liveData.value?.data?.totalResults!! > recipesAdapter.itemCount) {
                 fetchRecipes()
             }
     }
@@ -92,7 +122,7 @@ class FragmentSearch : BaseFragment(R.layout.fragment_search) {
         viewModel.liveData.observe(
             viewLifecycleOwner, { event ->
                 when (event.status) {
-                    Status.SUCCESS -> onSuccess( data = event.data!!)
+                    Status.SUCCESS -> onSuccess(data = event.data!!)
                     Status.EMPTY -> onEmptyData()
                     Status.ERROR -> onError()
                 }
@@ -100,30 +130,34 @@ class FragmentSearch : BaseFragment(R.layout.fragment_search) {
     }
 
     private fun onEmptyData() {
+        recipesAdapter.removeLoader()
         Toast.makeText(activity, "On your request nothing were found.", Toast.LENGTH_LONG).show()
     }
 
     private fun onSuccess(data: ResponseSearch) {
         recipesAdapter.removeLoader()
         data.results?.let { recipesAdapter.setItems(meals = it) }
-        showOptions()
     }
+
     private fun onLoading() {
         recipesAdapter.addLoader()
     }
 
     private fun onError() {
-        Toast.makeText(activity, "Something went wrong. Try again later.", Toast.LENGTH_SHORT).show()
+        recipesAdapter.removeLoader()
+        Toast.makeText(activity, "Something went wrong. Try again later.", Toast.LENGTH_SHORT)
+            .show()
     }
 
-
-    private fun showOptions() {
-        search_options.visibility = View.VISIBLE
+    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        when(parent?.id) {
+            R.id.sortList_spinner -> viewModel.sortBy = parent.getItemAtPosition(position).toString()
+            R.id.sortDirList_spinner -> viewModel.sortDir = parent.getItemAtPosition(position).toString()
+        }
+        recipesAdapter.removeAll()
+        fetchRecipes()
     }
 
-    private fun hideOptions() {
-        search_options.visibility = View.GONE
+    override fun onNothingSelected(parent: AdapterView<*>?) {
     }
-
-
 }

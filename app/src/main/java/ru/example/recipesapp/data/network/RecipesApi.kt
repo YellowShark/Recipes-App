@@ -11,7 +11,9 @@ interface RecipesApi {
     @GET("/recipes/complexSearch")
     suspend fun getListOfRecipes(
         @Query("query") mealName: String,
-        @Query("number") num: Int
+        @Query("number") num: Int = 10,
+        @Query("sort") sortBy: String,
+        @Query("sortDirection") sortDirection: String
     ) : ResponseSearch
 
     @GET("/recipes/{id}/information")

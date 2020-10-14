@@ -22,4 +22,5 @@
     <string name="ui_mode">ui_mode</string>
     <string name="sort_by">Sort by</string>
     <string name="filters">Filters</string>
+    <string name="sort_direction">Sort direction</string>
 </resources>

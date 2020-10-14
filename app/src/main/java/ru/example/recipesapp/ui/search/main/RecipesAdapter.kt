@@ -22,7 +22,7 @@ class RecipesAdapter(private val listener: (Meal) -> Unit) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == VIEW_ITEM_TYPE)
-            RecipeHolder.create(parent)
+            ViewHolder.create(parent)
         else {
             Log.d("TAG", "onCreateViewHolder: hello")
             val v = LayoutInflater.from(parent.context)
@@ -32,7 +32,7 @@ class RecipesAdapter(private val listener: (Meal) -> Unit) :
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (holder is RecipeHolder) {
+        if (holder is ViewHolder) {
             val item = data[position]
             holder.apply {
                 bind(item as Meal)
@@ -68,7 +68,7 @@ class RecipesAdapter(private val listener: (Meal) -> Unit) :
         notifyDataSetChanged()
     }
 
-    class RecipeHolder(private val binding: ItemRecipeBinding) :
+    class ViewHolder(private val binding: ItemRecipeBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(meal: Meal) {
             bindImage(meal.image)
@@ -87,15 +87,15 @@ class RecipesAdapter(private val listener: (Meal) -> Unit) :
         }
 
         companion object {
-            fun create(parent: ViewGroup): RecipeHolder {
+            fun create(parent: ViewGroup): ViewHolder {
                 val inflater = LayoutInflater.from(parent.context)
                 val binding: ItemRecipeBinding =
                     DataBindingUtil.inflate(inflater, R.layout.item_recipe, parent, false)
-                return RecipeHolder(binding)
+                return ViewHolder(binding)
             }
         }
     }
 
     data class Loader(val data: String = "load")
-    class LoadingViewHolder(view: View) : RecyclerView.ViewHolder(view)
+    inner class LoadingViewHolder(view: View) : RecyclerView.ViewHolder(view)
 }
