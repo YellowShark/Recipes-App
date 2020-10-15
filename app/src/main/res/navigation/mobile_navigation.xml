@@ -27,6 +27,21 @@
             app:destination="@id/destination_details"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim" />
+        <action
+            android:id="@+id/action_filters"
+            app:destination="@id/destination_filters" />
+        <argument
+            android:name="filterCuisine"
+            app:argType="string"
+            android:defaultValue='""' />
+        <argument
+            android:name="filterDiet"
+            app:argType="string"
+            android:defaultValue='""' />
+        <argument
+            android:name="filterType"
+            app:argType="string"
+            android:defaultValue='""' />
     </fragment>
     <fragment
         android:id="@+id/destination_details"
@@ -41,4 +56,13 @@
         android:id="@+id/destination_settings"
         android:name="ru.example.recipesapp.ui.settings.SettingsFragment"
         android:label="Settings" />
+    <fragment
+        android:id="@+id/destination_filters"
+        android:name="ru.example.recipesapp.ui.search.main.FragmentFilters"
+        android:label="@string/filters" >
+        <action
+            android:id="@+id/action_destination_filters_to_destination_search"
+            app:destination="@id/destination_search"
+            app:popUpTo="@id/destination_search" />
+    </fragment>
 </navigation>

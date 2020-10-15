@@ -17,13 +17,14 @@
             android:layout_height="wrap_content">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etSearchMeal"
+                android:id="@+id/searchRecipe_et"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:hint="@string/input_your_request_to_search"
                 android:imeOptions="actionSearch"
-                android:inputType="text" />
+                android:inputType="text"
+                android:text=""/>
 
         </com.google.android.material.textfield.TextInputLayout>
 

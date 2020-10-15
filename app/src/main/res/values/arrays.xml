@@ -12,6 +12,39 @@
         <item>desc</item>
     </string-array>
 
+    <string-array name="cuisines">
+        <item>All</item>
+        <item>American</item>
+        <item>British</item>
+        <item>Chinese</item>
+        <item>Eastern Europe</item>
+        <item>European</item>
+        <item>French</item>
+    </string-array>
+
+    <string-array name="diets">
+        <item>All</item>
+        <item>Vegetarian</item>
+        <item>Vegan</item>
+        <item>Gluten free</item>
+        <item>Ketogenic</item>
+    </string-array>
+
+    <string-array name="meal_types">
+        <item>All</item>
+        <item>Main course</item>
+        <item>Side dish</item>
+        <item>Dessert</item>
+        <item>Appetizer</item>
+        <item>Salad</item>
+        <item>Bread</item>
+        <item>Breakfast</item>
+        <item>Soup</item>
+        <item>Sauce</item>
+        <item>Snack</item>
+        <item>Drink</item>
+    </string-array>
+
     <!-- Reply Preference -->
     <string-array name="reply_entries">
         <item>Reply</item>

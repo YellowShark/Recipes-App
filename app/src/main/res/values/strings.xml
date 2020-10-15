@@ -23,4 +23,13 @@
     <string name="sort_by">Sort by</string>
     <string name="filters">Filters</string>
     <string name="sort_direction">Sort direction</string>
+    <string name="cuisine">Cuisine</string>
+    <string name="diet">Diet</string>
+    <string name="type_of_recipe">Type of recipe</string>
+    <string name="min_sugar">Min sugar</string>
+    <string name="userSearch">user_search</string>
+    <string name="searchText">search_text</string>
+    <string name="apply">Apply</string>
+    <string name="error_msg">Something went wrong. Try again later.</string>
+    <string name="nothing_found_msg">On your request nothing were found.</string>
 </resources>

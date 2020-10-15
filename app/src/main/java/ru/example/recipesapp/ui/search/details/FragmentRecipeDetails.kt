@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_recipe_details.*
 import kotlinx.android.synthetic.main.loading_layout.*
@@ -59,13 +60,13 @@ class FragmentRecipeDetails : BaseFragment(R.layout.fragment_recipe_details) {
             val safeArgs = FragmentRecipeDetailsArgs.fromBundle(it)
             viewModel.requestDetails(safeArgs.recipeId)
         }
-        viewModel.liveData.observe(viewLifecycleOwner, { event ->
+        viewModel.liveData.observe(viewLifecycleOwner) { event ->
             when (event.status) {
                 Status.LOADING -> onLoading()
                 Status.SUCCESS -> onSuccess(event.data!!)
                 Status.ERROR -> onError()
             }
-        })
+        }
     }
 
     private fun onSuccess(data: ResponseDetails) {

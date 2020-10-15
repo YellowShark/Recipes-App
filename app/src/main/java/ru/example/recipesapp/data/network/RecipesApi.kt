@@ -13,7 +13,10 @@ interface RecipesApi {
         @Query("query") mealName: String,
         @Query("number") num: Int = 10,
         @Query("sort") sortBy: String,
-        @Query("sortDirection") sortDirection: String
+        @Query("sortDirection") sortDirection: String,
+        @Query("cuisine") cuisine: String = "",
+        @Query("diet") diet: String = "",
+        @Query("type") mealType: String = ""
     ) : ResponseSearch
 
     @GET("/recipes/{id}/information")

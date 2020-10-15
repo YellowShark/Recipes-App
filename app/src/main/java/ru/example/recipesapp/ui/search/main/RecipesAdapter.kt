@@ -1,6 +1,5 @@
 package ru.example.recipesapp.ui.search.main
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,7 +23,6 @@ class RecipesAdapter(private val listener: (Meal) -> Unit) :
         return if (viewType == VIEW_ITEM_TYPE)
             ViewHolder.create(parent)
         else {
-            Log.d("TAG", "onCreateViewHolder: hello")
             val v = LayoutInflater.from(parent.context)
                 .inflate(R.layout.item_loading, parent, false)
             LoadingViewHolder(v)
