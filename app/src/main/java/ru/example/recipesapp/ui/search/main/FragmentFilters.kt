@@ -8,8 +8,6 @@ import androidx.navigation.Navigation
 import kotlinx.android.synthetic.main.fragment_filters.*
 import ru.example.recipesapp.R
 import ru.example.recipesapp.ui.BaseFragment
-import ru.example.recipesapp.ui.search.main.FragmentFilters.Cuisines.*
-import ru.example.recipesapp.ui.search.main.FragmentFilters.MealTypes.*
 import ru.example.recipesapp.utils.underscoreToSpace
 
 class FragmentFilters : BaseFragment(R.layout.fragment_filters), View.OnClickListener {
@@ -55,21 +53,10 @@ class FragmentFilters : BaseFragment(R.layout.fragment_filters), View.OnClickLis
             .setTitle("Choose a cuisine")
             .setItems(R.array.cuisines) { _, which ->
                 cuisine = when (which) {
-                    ALL.ordinal -> ""
-
-                    AMERICAN.ordinal -> AMERICAN.name.toLowerCase()
-
-                    BRITISH.ordinal -> BRITISH.name.toLowerCase()
-
-                    CHINESE.ordinal -> CHINESE.name.toLowerCase()
-
-                    EASTERN_EUROPE.ordinal -> EASTERN_EUROPE.name.underscoreToSpace().toLowerCase()
-
-                    EUROPEAN.ordinal -> EUROPEAN.name.toLowerCase()
-
-                    FRENCH.ordinal -> FRENCH.name.toLowerCase()
-
-                    else -> ""
+                    Cuisines.ALL.ordinal -> ""
+                    Cuisines.EASTERN_EUROPE.ordinal -> Cuisines.EASTERN_EUROPE.name.underscoreToSpace()
+                        .toLowerCase()
+                    else -> Cuisines.values()[which].name.toLowerCase()
                 }
             }
             .create()
@@ -83,11 +70,9 @@ class FragmentFilters : BaseFragment(R.layout.fragment_filters), View.OnClickLis
             .setItems(R.array.diets) { _, which ->
                 diet = when (which) {
                     Diets.ALL.ordinal -> ""
-                    Diets.VEGETARIAN.ordinal -> Diets.VEGETARIAN.name.toLowerCase()
-                    Diets.VEGAN.ordinal -> Diets.VEGAN.name.toLowerCase()
-                    Diets.GLUTEN_FREE.ordinal -> Diets.GLUTEN_FREE.name.underscoreToSpace().toLowerCase()
-                    Diets.KETOGENIC.ordinal -> Diets.KETOGENIC.name.toLowerCase()
-                    else -> ""
+                    Diets.GLUTEN_FREE.ordinal -> Diets.GLUTEN_FREE.name.underscoreToSpace()
+                        .toLowerCase()
+                    else -> Diets.values()[which].name.toLowerCase()
                 }
             }
             .create()
@@ -98,21 +83,14 @@ class FragmentFilters : BaseFragment(R.layout.fragment_filters), View.OnClickLis
     private fun showTypeDialog() {
         AlertDialog.Builder(context)
             .setTitle("Choose a meal type")
-            .setItems(R.array.meal_types) {_, which ->
-                type = when(which) {
-                    All.ordinal -> ""
-                    MAIN_COURSE.ordinal -> MAIN_COURSE.name.underscoreToSpace().toLowerCase()
-                    SIDE_DISH.ordinal -> SIDE_DISH.name.underscoreToSpace().toLowerCase()
-                    DESSERT.ordinal -> DESSERT.name.toLowerCase()
-                    APPETIZER.ordinal -> APPETIZER.name.toLowerCase()
-                    SALAD.ordinal -> SALAD.name.toLowerCase()
-                    BREAD.ordinal -> BREAD.name.toLowerCase()
-                    BREAKFAST.ordinal -> BREAKFAST.name.toLowerCase()
-                    SOUP.ordinal -> SOUP.name.toLowerCase()
-                    SAUCE.ordinal -> SAUCE.name.toLowerCase()
-                    SNACK.ordinal -> SNACK.name.toLowerCase()
-                    DRINK.ordinal -> DRINK.name.toLowerCase()
-                    else -> ""
+            .setItems(R.array.meal_types) { _, which ->
+                type = when (which) {
+                    MealTypes.All.ordinal -> ""
+                    MealTypes.MAIN_COURSE.ordinal -> MealTypes.MAIN_COURSE.name.underscoreToSpace()
+                        .toLowerCase()
+                    MealTypes.SIDE_DISH.ordinal -> MealTypes.SIDE_DISH.name.underscoreToSpace()
+                        .toLowerCase()
+                    else -> MealTypes.values()[which].name.toLowerCase()
                 }
             }
             .create()
