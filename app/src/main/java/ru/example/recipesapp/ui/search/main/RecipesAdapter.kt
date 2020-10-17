@@ -8,16 +8,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.item_recipe.view.*
 import ru.example.recipesapp.R
-import ru.example.recipesapp.data.network.model.search.Meal
+import ru.example.recipesapp.data.network.model.search.Recipe
 import ru.example.recipesapp.databinding.ItemRecipeBinding
 
 
-class RecipesAdapter(private val listener: (Meal) -> Unit) :
+class RecipesAdapter :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val VIEW_ITEM_TYPE = 0
     private val VIEW_LOADING_TYPE = 1
     private val data = ArrayList<Any>()
+    var onItemClick: ((Recipe) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == VIEW_ITEM_TYPE)
@@ -33,8 +34,8 @@ class RecipesAdapter(private val listener: (Meal) -> Unit) :
         if (holder is ViewHolder) {
             val item = data[position]
             holder.apply {
-                bind(item as Meal)
-                itemView.btnViewRecipe.setOnClickListener { listener(item as Meal) }
+                bind(item as Recipe)
+                itemView.btnViewRecipe.setOnClickListener { onItemClick?.let { it -> it(item) } }
             }
         }
     }
@@ -42,12 +43,12 @@ class RecipesAdapter(private val listener: (Meal) -> Unit) :
     override fun getItemCount(): Int = data.size
 
     override fun getItemViewType(position: Int): Int {
-        return if (data[position] is Meal) VIEW_ITEM_TYPE else VIEW_LOADING_TYPE
+        return if (data[position] is Recipe) VIEW_ITEM_TYPE else VIEW_LOADING_TYPE
     }
 
-    fun setItems(meals: List<Meal>) {
+    fun setItems(recipes: List<Recipe>) {
         data.clear()
-        data.addAll(meals)
+        data.addAll(recipes)
         notifyDataSetChanged()
     }
 
@@ -68,10 +69,10 @@ class RecipesAdapter(private val listener: (Meal) -> Unit) :
 
     class ViewHolder(private val binding: ItemRecipeBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(meal: Meal) {
-            bindImage(meal.image)
+        fun bind(recipe: Recipe) {
+            bindImage(recipe.image)
             with(binding) {
-                mealName = meal.title
+                mealName = recipe.title
                 executePendingBindings()
             }
         }

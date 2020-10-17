@@ -1,6 +1,5 @@
 package ru.example.recipesapp.ui.search.main
 
-import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -15,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_search.*
 import org.koin.android.viewmodel.ext.android.viewModel
 import ru.example.recipesapp.R
+import ru.example.recipesapp.data.network.model.search.Recipe
 import ru.example.recipesapp.data.network.model.search.ResponseSearch
 import ru.example.recipesapp.ui.BaseFragment
 import ru.example.recipesapp.utils.Event
@@ -26,7 +26,7 @@ class FragmentSearch : BaseFragment(R.layout.fragment_search),
     AdapterView.OnItemSelectedListener {
 
     private val viewModel: SearchViewModel by viewModel()
-    private lateinit var recipesAdapter: RecipesAdapter
+    private val recipesAdapter by lazy { RecipesAdapter() }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -36,14 +36,7 @@ class FragmentSearch : BaseFragment(R.layout.fragment_search),
 
     override fun onResume() {
         super.onResume()
-        searchRecipe_et.setText(getSearchValue())
         getFilters()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        activity?.getSharedPreferences(getString(R.string.userSearch), Context.MODE_PRIVATE)?.edit()
-            ?.clear()?.apply()
     }
 
     private fun getFilters() {
@@ -58,19 +51,11 @@ class FragmentSearch : BaseFragment(R.layout.fragment_search),
         }
     }
 
-    private fun getSearchValue(): String {
-        val sharedPreferences =
-            activity?.getSharedPreferences(getString(R.string.userSearch), Context.MODE_PRIVATE)
-                ?: return ""
-        return sharedPreferences.getString(getString(R.string.searchText), "")!!
-    }
-
     private fun initUi() {
         searchRecipe_et.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH && searchRecipe_et.text!!.isNotEmpty()) {
                 fetchRecipes()
                 view?.let { activity?.hideKeyboard(it) }
-                saveValue()
                 return@setOnEditorActionListener true
             }
             return@setOnEditorActionListener false
@@ -80,23 +65,13 @@ class FragmentSearch : BaseFragment(R.layout.fragment_search),
             searchRecipe_et.setText("")
             recipesAdapter.removeAll()
         }
-        filter_btn.setOnClickListener { showFilters() }
+        filter_btn.setOnClickListener { openFiltersFragment() }
 
         initRecyclerView()
         initSpinners()
     }
 
-    private fun saveValue() {
-        activity?.let {
-            val text = searchRecipe_et.text.toString()
-            val sharedPref =
-                it.getSharedPreferences(getString(R.string.userSearch), Context.MODE_PRIVATE)
-            val editor = sharedPref.edit()
-            editor.putString(getString(R.string.searchText), text).apply()
-        }
-    }
-
-    private fun showFilters() {
+    private fun openFiltersFragment() {
         val actionFilters =
             FragmentSearchDirections.actionFilters()
         view?.let { Navigation.findNavController(it).navigate(actionFilters) }
@@ -126,12 +101,7 @@ class FragmentSearch : BaseFragment(R.layout.fragment_search),
     }
 
     private fun initRecyclerView() {
-        recipesAdapter = RecipesAdapter { item ->
-            val actionDetails =
-                FragmentSearchDirections.actionDestinationSearchToDestinationDetails()
-            actionDetails.recipeId = item.id
-            view?.let { Navigation.findNavController(it).navigate(actionDetails) }
-        }
+        recipesAdapter.onItemClick = { item -> openFragmentDetails(item) }
 
         val recipesLayoutManager = LinearLayoutManager(activity)
 
@@ -156,6 +126,13 @@ class FragmentSearch : BaseFragment(R.layout.fragment_search),
                 }
             }
         })
+    }
+
+    private fun openFragmentDetails(item: Recipe) {
+        val actionDetails =
+            FragmentSearchDirections.actionDestinationSearchToDestinationDetails()
+        actionDetails.recipeId = item.id
+        view?.let { Navigation.findNavController(it).navigate(actionDetails) }
     }
 
     private fun loadMore() {
@@ -197,7 +174,7 @@ class FragmentSearch : BaseFragment(R.layout.fragment_search),
         data.results?.let {
             if (it.isNotEmpty()) {
                 recipesAdapter.removeLoader()
-                recipesAdapter.setItems(meals = it)
+                recipesAdapter.setItems(recipes = it)
             }
             else
                 viewModel.liveData.value = Event.empty()

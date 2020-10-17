@@ -8,7 +8,7 @@ data class ResponseSearch(
     @SerializedName("number")
     val number: Long? = null,
     @SerializedName("results")
-    val results: List<Meal>? = null,
+    val results: List<Recipe>? = null,
     @SerializedName("totalResults")
     val totalResults: Long = 0
 )
