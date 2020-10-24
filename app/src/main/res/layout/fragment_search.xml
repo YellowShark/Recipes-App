@@ -12,21 +12,11 @@
         android:padding="8dp"
         tools:ignore="UselessParent">
 
-        <com.google.android.material.textfield.TextInputLayout
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/search_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/searchRecipe_et"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:hint="@string/input_your_request_to_search"
-                android:imeOptions="actionSearch"
-                android:inputType="text"
-                android:text=""/>
-
-        </com.google.android.material.textfield.TextInputLayout>
+            android:layout_height="?attr/actionBarSize"
+            app:menu="@menu/toolbar_search" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/search_options"
@@ -55,7 +45,7 @@
                     android:textSize="16sp" />
 
                 <Spinner
-                    android:id="@+id/sortList_spinner"
+                    android:id="@+id/sortByList_spinner"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
@@ -98,7 +88,12 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <include
+            layout="@layout/loading_layout"
+            android:visibility="gone" />
+
         <ScrollView
+            android:id="@+id/content_sv"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="8dp">

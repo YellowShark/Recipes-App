@@ -32,4 +32,7 @@
     <string name="apply">Apply</string>
     <string name="error_msg">Something went wrong. Try again later.</string>
     <string name="nothing_found_msg">On your request nothing were found.</string>
+    <string name="home">Home</string>
+    <string name="search">Search</string>
+    <string name="search_here">Search here</string>
 </resources>

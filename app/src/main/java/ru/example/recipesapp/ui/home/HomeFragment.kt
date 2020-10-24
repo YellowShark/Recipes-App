@@ -11,7 +11,7 @@ class HomeFragment : BaseFragment(R.layout.fragment_home) {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         btnGoSearch.setOnClickListener {
-            val actionSearch = HomeFragmentDirections.actionToSearch()
+            val actionSearch = HomeFragmentDirections.actionToSearch("", "", "")
             view?.let { Navigation.findNavController(it).navigate(actionSearch) }
         }
     }

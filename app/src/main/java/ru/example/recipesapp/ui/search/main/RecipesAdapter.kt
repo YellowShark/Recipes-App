@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.item_recipe.view.*
 import ru.example.recipesapp.R
-import ru.example.recipesapp.data.network.model.search.Recipe
+import ru.example.recipesapp.data.network.search.response.Recipe
 import ru.example.recipesapp.databinding.ItemRecipeBinding
 
 

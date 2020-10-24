@@ -7,8 +7,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_step.view.*
 import ru.example.recipesapp.R
-import ru.example.recipesapp.data.network.model.details.Instruction
-import ru.example.recipesapp.data.network.model.details.Step
+import ru.example.recipesapp.data.network.details.response.Instruction
+import ru.example.recipesapp.data.network.details.response.Step
 import ru.example.recipesapp.databinding.ItemStepBinding
 import java.util.*
 

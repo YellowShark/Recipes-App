@@ -1,4 +1,4 @@
-package ru.example.recipesapp.data.network.model.search
+package ru.example.recipesapp.data.network.search.response
 
 import com.google.gson.annotations.SerializedName
 

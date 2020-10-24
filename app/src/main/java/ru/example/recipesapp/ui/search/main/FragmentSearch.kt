@@ -1,80 +1,142 @@
 package ru.example.recipesapp.ui.search.main
 
 import android.os.Bundle
+import android.util.Log
+import android.view.KeyEvent
+import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Toast
-import androidx.lifecycle.observe
+import android.widget.*
+import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_search.*
+import kotlinx.android.synthetic.main.loading_layout.*
 import org.koin.android.viewmodel.ext.android.viewModel
 import ru.example.recipesapp.R
-import ru.example.recipesapp.data.network.model.search.Recipe
-import ru.example.recipesapp.data.network.model.search.ResponseSearch
+import ru.example.recipesapp.data.db.entity.CurrentSearchResults
+import ru.example.recipesapp.data.network.search.response.Recipe
 import ru.example.recipesapp.ui.BaseFragment
-import ru.example.recipesapp.utils.Event
-import ru.example.recipesapp.utils.Status
-import ru.example.recipesapp.utils.hideKeyboard
+import ru.example.recipesapp.utils.*
 
 
 class FragmentSearch : BaseFragment(R.layout.fragment_search),
-    AdapterView.OnItemSelectedListener {
+    AdapterView.OnItemSelectedListener, View.OnClickListener, TextView.OnEditorActionListener {
 
+    private lateinit var searchItem: MenuItem
+    private lateinit var searchView: SearchView
     private val viewModel: SearchViewModel by viewModel()
-    private val recipesAdapter by lazy { RecipesAdapter() }
+    private val recipesListAdapter by lazy { RecipesAdapter() }
+    private val eventObserver = Observer<Event<CurrentSearchResults>> { event ->
+        Log.d("TAG", "fragment: ${event.status.name}")
+        when (event.status) {
+            Status.LOADING -> showLoader()
+            Status.PAGING -> addLoader()
+            Status.SUCCESS -> {
+                removeLoader()
+                recipesListAdapter.setItems(recipes = event.data!!.results)
+            }
+            Status.EMPTY -> {
+                removeLoader()
+                recipesListAdapter.removeAll()
+                searchView.setQuery("", false)
+                showNothingFoundMsg()
+            }
+            Status.ERROR -> {
+                removeLoader()
+                showErrorMsg()
+            }
+            Status.DEFAULT -> {
+                //TODO
+                //show something interesting))
+            }
+        }
+    }
+
+    private fun showLoader() {
+        loading_view.visibility = View.VISIBLE
+        content_sv.visibility = View.GONE
+    }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         initUi()
-        initData()
+        observeViewModel()
     }
 
     override fun onResume() {
+        Log.d(TAG, "onResume: ")
         super.onResume()
+        searchView.setQuery(viewModel.query.text, true)
         getFilters()
     }
 
-    private fun getFilters() {
-        arguments?.let {
-            val args = FragmentSearchArgs.fromBundle(it)
-            with(viewModel) {
-                cuisine = args.filterCuisine
-                diet = args.filterDiet
-                type = args.filterType
-            }
-            reloadData()
-        }
+    override fun onDestroy() {
+        viewModel.deleteLastSearchQuery()
+        Log.d(TAG, "onDestroy: ")
+        super.onDestroy()
+    }
+
+    private fun observeViewModel() {
+        viewModel.eventLive.observe(viewLifecycleOwner, eventObserver)
     }
 
     private fun initUi() {
-        searchRecipe_et.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_SEARCH && searchRecipe_et.text!!.isNotEmpty()) {
-                fetchRecipes()
-                view?.let { activity?.hideKeyboard(it) }
-                return@setOnEditorActionListener true
-            }
-            return@setOnEditorActionListener false
-        }
-
-        searchRecipe_et.setOnClickListener {
-            searchRecipe_et.setText("")
-            recipesAdapter.removeAll()
-        }
-        filter_btn.setOnClickListener { openFiltersFragment() }
-
+        initListeners()
         initRecyclerView()
         initSpinners()
+        initSearchView()
     }
 
-    private fun openFiltersFragment() {
-        val actionFilters =
-            FragmentSearchDirections.actionFilters()
-        view?.let { Navigation.findNavController(it).navigate(actionFilters) }
+    private fun initSearchView() {
+        searchItem = search_toolbar.menu.findItem(R.id.action_search)
+        searchView = searchItem.actionView as SearchView
+        with(searchView) {
+            focusable = SearchView.FOCUSABLE
+            isIconified = false
+            queryHint = getString(R.string.search_here)
+            setOnQueryTextListener(searchTextListener())
+            setOnCloseListener { searchItem.collapseActionView() }
+            //TODO searchAdapter = ...
+            /*setOnSuggestionListener(searchAdapterListener())*/
+        }
+    }
+
+    private fun searchTextListener() = object : SearchView.OnQueryTextListener {
+        override fun onQueryTextSubmit(query: String?): Boolean {
+            with(searchView) {
+                clearFocus()
+                searchItem.collapseActionView()
+                if (query != null && query.length > 2) {
+                    viewModel.query.text = query
+                }
+                setQuery("", false)
+            }
+            return true
+        }
+
+        override fun onQueryTextChange(newText: String): Boolean {
+            //searchAdapter.changeCursor(null)
+            if (newText.length >= 2) {
+                viewModel.query.text = newText
+                searchRecipe()
+            }
+            return true
+        }
+    }
+
+    /*private fun searchAdapterListener() = object : SearchView.OnSuggestionListener {
+        override fun onSuggestionSelect(id: Int): Boolean = false
+        override fun onSuggestionClick(id: Int): Boolean {
+            //not yet implemented
+            return true
+        }
+    }*/
+
+    private fun initListeners() {
+        filter_btn.setOnClickListener(this)
     }
 
     private fun initSpinners() {
@@ -83,25 +145,33 @@ class FragmentSearch : BaseFragment(R.layout.fragment_search),
                 ctx,
                 R.array.sort_array,
                 android.R.layout.simple_spinner_item
-            ).also { adapter ->
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                sortList_spinner.adapter = adapter
-                sortList_spinner.onItemSelectedListener = this
+            ).also { sortByAdapter ->
+                sortByAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                sortByList_spinner.apply {
+                    adapter = sortByAdapter
+                    setSelection(sortByAdapter.getPosition(viewModel.query.sortBy))
+                    onItemSelectedListener = this@FragmentSearch
+                }
             }
             ArrayAdapter.createFromResource(
                 ctx,
                 R.array.sort_directions,
                 android.R.layout.simple_spinner_item
-            ).also { adapter ->
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                sortDirList_spinner.adapter = adapter
+            ).also { sortDirAdapter ->
+                sortDirAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                sortDirList_spinner.apply {
+                    adapter = sortDirAdapter
+                    setSelection(sortDirAdapter.getPosition(viewModel.query.sortDir))
+                    onItemSelectedListener = this@FragmentSearch
+                }
+                sortDirList_spinner.adapter = sortDirAdapter
                 sortDirList_spinner.onItemSelectedListener = this
             }
         }
     }
 
     private fun initRecyclerView() {
-        recipesAdapter.onItemClick = { item -> openFragmentDetails(item) }
+        recipesListAdapter.onItemClick = { item -> openFragmentDetails(item) }
 
         val recipesLayoutManager = LinearLayoutManager(activity)
 
@@ -110,7 +180,7 @@ class FragmentSearch : BaseFragment(R.layout.fragment_search),
 
         recipesList_rv.apply {
             layoutManager = recipesLayoutManager
-            adapter = recipesAdapter
+            adapter = recipesListAdapter
             addItemDecoration(divider)
         }
 
@@ -119,13 +189,33 @@ class FragmentSearch : BaseFragment(R.layout.fragment_search),
                 super.onScrolled(recyclerView, dx, dy)
                 val linearLayoutManager = recyclerView.layoutManager as LinearLayoutManager?
                 if (linearLayoutManager != null
-                    && linearLayoutManager.findLastCompletelyVisibleItemPosition() == recipesAdapter.itemCount - 1
+                    && recipesListAdapter.itemCount >= PAGE_SIZE
+                    && linearLayoutManager.findLastCompletelyVisibleItemPosition() == recipesListAdapter.itemCount - 2
                 ) {
-                    //bottom of list!
-                    loadMore()
+                    viewModel.loadMore()
                 }
             }
         })
+    }
+
+    private fun openFiltersFragment() {
+        val actionFilters =
+            FragmentSearchDirections.actionFilters()
+        view?.let { Navigation.findNavController(it).navigate(actionFilters) }
+    }
+
+    private fun getFilters() {
+        arguments?.let {
+            val args = FragmentSearchArgs.fromBundle(it)
+            if (args.filterCuisine.isNotEmpty() || args.filterDiet.isNotEmpty() || args.filterType.isNotEmpty()) {
+                with(viewModel.query) {
+                    cuisine = args.filterCuisine
+                    diet = args.filterDiet
+                    type = args.filterType
+                }
+                reloadData()
+            }
+        }
     }
 
     private fun openFragmentDetails(item: Recipe) {
@@ -135,77 +225,69 @@ class FragmentSearch : BaseFragment(R.layout.fragment_search),
         view?.let { Navigation.findNavController(it).navigate(actionDetails) }
     }
 
-    private fun loadMore() {
-        if (viewModel.liveData.value?.data != null)
-            if (recipesAdapter.itemCount > 1 //to except situation with loading and double request
-                && viewModel.liveData.value?.data?.totalResults!! > recipesAdapter.itemCount
-            ) {
-                fetchRecipes()
-            }
-    }
-
-    private fun fetchRecipes() {
-        val inputtedText = searchRecipe_et.text.toString()
-        if (inputtedText.isNotEmpty()) {
-            viewModel.startSearchRecipe(request = inputtedText, num = recipesAdapter.itemCount + 10)
-            onLoading()
+    private fun searchRecipe() {
+        Log.d("TAG", "searchRecipe: ")
+        with(viewModel) {
+            searchRecipes()
         }
     }
 
-    private fun initData() {
-        viewModel.liveData.observe(
-            viewLifecycleOwner
-        ) { event ->
-            when (event.status) {
-                Status.SUCCESS -> onSuccess(data = event.data!!)
-                Status.EMPTY -> onEmptyData()
-                Status.ERROR -> onError()
-            }
+    private fun addLoader() {
+        recipesListAdapter.addLoader()
+    }
+
+    private fun removeLoader() {
+        if (content_sv.visibility == View.GONE) {
+            content_sv.visibility = View.VISIBLE
+            loading_view.visibility = View.GONE
+            return
         }
-    }
-
-    private fun onEmptyData() {
-        recipesAdapter.removeLoader()
-        searchRecipe_et.setText("")
-        Toast.makeText(activity, getString(R.string.nothing_found_msg), Toast.LENGTH_SHORT).show()
-    }
-
-    private fun onSuccess(data: ResponseSearch) {
-        data.results?.let {
-            if (it.isNotEmpty()) {
-                recipesAdapter.removeLoader()
-                recipesAdapter.setItems(recipes = it)
-            }
-            else
-                viewModel.liveData.value = Event.empty()
-        }
-    }
-
-    private fun onLoading() {
-        recipesAdapter.addLoader()
-    }
-
-    private fun onError() {
-        recipesAdapter.removeLoader()
-        Toast.makeText(activity, getString(R.string.error_msg), Toast.LENGTH_SHORT)
-            .show()
+        recipesListAdapter.removeLoader()
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        when (parent?.id) {
-            R.id.sortList_spinner -> viewModel.sortBy =
-                parent.getItemAtPosition(position).toString()
-            R.id.sortDirList_spinner -> viewModel.sortDir =
-                parent.getItemAtPosition(position).toString()
+        with(viewModel.query) {
+            when (parent?.id) {
+                R.id.sortByList_spinner -> sortBy =
+                    parent.getItemAtPosition(position).toString()
+                R.id.sortDirList_spinner -> sortDir =
+                    parent.getItemAtPosition(position).toString()
+            }
         }
         reloadData()
     }
 
+    private fun showErrorMsg() {
+        Toast.makeText(activity, getString(R.string.error_msg), Toast.LENGTH_SHORT)
+            .show()
+    }
+
+    private fun showNothingFoundMsg() {
+        Toast.makeText(activity, getString(R.string.nothing_found_msg), Toast.LENGTH_SHORT)
+            .show()
+    }
+
+
     private fun reloadData() {
-        recipesAdapter.removeAll()
-        fetchRecipes()
+        recipesListAdapter.removeAll()
+        searchRecipe()
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
+    }
+
+    override fun onClick(v: View?) {
+        when (v?.id) {
+            R.id.filter_btn -> openFiltersFragment()
+        }
+    }
+
+    override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
+        if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+            searchRecipe()
+            view?.let { activity?.hideKeyboard(it) }
+            return true
+        }
+        return false
     }
 }

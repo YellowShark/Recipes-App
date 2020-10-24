@@ -7,6 +7,9 @@ data class Event<out T>(val status: Status = Status.EMPTY, val data: T?, val err
             return Event(Status.LOADING, null, null)
         }
 
+        fun <T> paging(): Event<T> {
+            return Event(Status.PAGING, null, null)
+        }
         fun <T> success(data: T?): Event<T> {
             return Event(Status.SUCCESS, data, null)
         }
@@ -18,12 +21,18 @@ data class Event<out T>(val status: Status = Status.EMPTY, val data: T?, val err
         fun <T> error(error: Error?): Event<T> {
             return Event(Status.ERROR, null, error)
         }
+
+        fun <T> default(): Event<T> {
+            return Event(Status.DEFAULT, null, null)
+        }
     }
 }
 
 enum class Status {
     LOADING,
     SUCCESS,
+    PAGING,
     EMPTY,
-    ERROR;
+    ERROR,
+    DEFAULT;
 }

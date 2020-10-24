@@ -6,22 +6,30 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.observe
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_recipe_details.*
 import kotlinx.android.synthetic.main.loading_layout.*
 import org.koin.android.viewmodel.ext.android.viewModel
 import ru.example.recipesapp.R
-import ru.example.recipesapp.data.network.model.details.ResponseDetails
+import ru.example.recipesapp.data.network.details.response.Details
 import ru.example.recipesapp.databinding.FragmentRecipeDetailsBinding
 import ru.example.recipesapp.ui.BaseFragment
+import ru.example.recipesapp.utils.Event
 import ru.example.recipesapp.utils.Status
 
 class FragmentRecipeDetails : BaseFragment(R.layout.fragment_recipe_details) {
 
     private val viewModel: RecipeDetailsViewModel by viewModel()
-    private lateinit var instructionAdapter: InstructionAdapter
+    private val instructionAdapter by lazy { InstructionAdapter() }
     private lateinit var binding: FragmentRecipeDetailsBinding
+    private val eventObserver = Observer<Event<Details>> { event ->
+        when (event.status) {
+            Status.LOADING -> onLoading()
+            Status.SUCCESS -> onSuccess(event.data!!)
+            Status.ERROR -> onError()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,10 +43,7 @@ class FragmentRecipeDetails : BaseFragment(R.layout.fragment_recipe_details) {
             false
         )
 
-        binding.apply {
-            lifecycleOwner = this@FragmentRecipeDetails
-            viewmodel = viewModel
-        }
+        binding.lifecycleOwner = this@FragmentRecipeDetails
         return binding.root
     }
 
@@ -48,7 +53,6 @@ class FragmentRecipeDetails : BaseFragment(R.layout.fragment_recipe_details) {
     }
 
     private fun initUi() {
-        instructionAdapter = InstructionAdapter()
         recipesList_rv.apply {
             layoutManager = LinearLayoutManager(activity)
             adapter = instructionAdapter
@@ -60,22 +64,16 @@ class FragmentRecipeDetails : BaseFragment(R.layout.fragment_recipe_details) {
             val safeArgs = FragmentRecipeDetailsArgs.fromBundle(it)
             viewModel.requestDetails(safeArgs.recipeId)
         }
-        viewModel.liveData.observe(viewLifecycleOwner) { event ->
-            when (event.status) {
-                Status.LOADING -> onLoading()
-                Status.SUCCESS -> onSuccess(event.data!!)
-                Status.ERROR -> onError()
-            }
-        }
+        viewModel.eventLive.observe(viewLifecycleOwner, eventObserver)
     }
 
-    private fun onSuccess(data: ResponseDetails) {
+    private fun onSuccess(data: Details) {
         details_view.visibility = View.VISIBLE
         loading_view.visibility = View.GONE
         instructionAdapter.setItems(data.analyzedInstructions)
-        viewModel.apply {
-            recipeName.value = data.title
-            recipeImage.value = data.image
+        binding.apply {
+            recipeName = data.title
+            recipeImage = data.image
         }
     }
 
@@ -86,13 +84,5 @@ class FragmentRecipeDetails : BaseFragment(R.layout.fragment_recipe_details) {
     private fun onLoading() {
         details_view.visibility = View.GONE
         loading_view.visibility = View.VISIBLE
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        binding.apply {
-            viewmodel = null
-            executePendingBindings()
-        }
     }
 }

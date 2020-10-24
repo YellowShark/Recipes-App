@@ -36,10 +36,11 @@ class FragmentFilters : BaseFragment(R.layout.fragment_filters), View.OnClickLis
             }
             R.id.apply_btn -> {
                 val actionBack =
-                    FragmentFiltersDirections.actionDestinationFiltersToDestinationSearch()
-                actionBack.filterCuisine = cuisine
-                actionBack.filterDiet = diet
-                actionBack.filterType = type
+                    FragmentFiltersDirections.actionDestinationFiltersToDestinationSearch(
+                        cuisine,
+                        diet,
+                        type
+                    )
                 view?.let {
                     Navigation.findNavController(it).navigate(actionBack)
                 }

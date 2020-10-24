@@ -7,6 +7,7 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.Navigation
 import androidx.navigation.ui.NavigationUI
 import kotlinx.android.synthetic.main.activity_main.*
@@ -28,6 +29,22 @@ class MainActivity : AppCompatActivity() {
         navController = Navigation.findNavController(this, R.id.nav_host_fragment)
         setupBottomNavMenu()
         setupActionBar()
+        navController.addOnDestinationChangedListener { navController: NavController, navDestination: NavDestination, bundle: Bundle? ->
+            when (navDestination.id) {
+                R.id.destination_home -> {
+                    toolbar.visibility = View.VISIBLE
+                    bottom_nav.visibility = View.VISIBLE
+                }
+                R.id.destination_search -> {
+                    bottom_nav.visibility = View.VISIBLE
+                    toolbar.visibility = View.GONE
+                }
+                else -> {
+                    toolbar.visibility = View.GONE
+                    bottom_nav.visibility = View.GONE
+                }
+            }
+        }
     }
 
     private fun setupBottomNavMenu() {
@@ -41,7 +58,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.toolbar_menu, menu)
+        menuInflater.inflate(R.menu.toolbar_home, menu)
         return true
     }
 

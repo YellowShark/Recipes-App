@@ -1,10 +1,11 @@
 package ru.example.recipesapp.data.network
 
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
-import ru.example.recipesapp.data.network.model.details.ResponseDetails
-import ru.example.recipesapp.data.network.model.search.ResponseSearch
+import ru.example.recipesapp.data.db.entity.CurrentSearchResults
+import ru.example.recipesapp.data.network.details.response.Details
 
 interface RecipesApi {
 
@@ -17,10 +18,10 @@ interface RecipesApi {
         @Query("cuisine") cuisine: String = "",
         @Query("diet") diet: String = "",
         @Query("type") mealType: String = ""
-    ) : ResponseSearch
+    ) : Response<CurrentSearchResults> 
 
     @GET("/recipes/{id}/information")
     suspend fun getRecipeDetails(
         @Path("id") id: Long
-    ) : ResponseDetails
+    ) : Response<Details>
 }

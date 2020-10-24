@@ -6,8 +6,12 @@
     <data>
 
         <variable
-            name="viewmodel"
-            type="ru.example.recipesapp.ui.search.details.RecipeDetailsViewModel" />
+            name="recipeName"
+            type="String" />
+
+        <variable
+            name="recipeImage"
+            type="String" />
 
         <import type="android.view.View" />
     </data>
@@ -31,12 +35,11 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/recipeName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     android:fontFamily="casual"
-                    android:text="@{viewmodel.recipeName}"
+                    android:text="@{recipeName}"
                     android:textColor="@android:color/black"
                     android:textSize="40sp" />
 
@@ -45,7 +48,7 @@
                     android:layout_width="300dp"
                     android:layout_height="300dp"
                     android:layout_margin="20dp"
-                    app:loadImage="@{viewmodel.recipeImage}"
+                    app:loadImage="@{recipeImage}"
                     tools:srcCompat="@tools:sample/avatars" />
 
                 <androidx.recyclerview.widget.RecyclerView

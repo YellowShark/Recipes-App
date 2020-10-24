@@ -1,4 +1,4 @@
-package ru.example.recipesapp.data.network.model.details
+package ru.example.recipesapp.data.network.details.response
 
 import com.google.gson.annotations.SerializedName
 
